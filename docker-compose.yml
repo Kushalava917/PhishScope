@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: sqlite:///./data/phishscope.db
+      ALLOWED_ORIGINS: http://127.0.0.1:3000,http://localhost:3000
+      ALLOWED_HOSTS: localhost,127.0.0.1,backend
+      VIRUSTOTAL_API_KEY: ${VIRUSTOTAL_API_KEY:-}
+      URLSCAN_API_KEY: ${URLSCAN_API_KEY:-}
+      ABUSEIPDB_API_KEY: ${ABUSEIPDB_API_KEY:-}
+      GOOGLE_SAFE_BROWSING_API_KEY: ${GOOGLE_SAFE_BROWSING_API_KEY:-}
+    volumes:
+      - phishscope-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  phishscope-data:

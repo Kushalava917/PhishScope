@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Backend, frontend, build, and browser workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r backend/requirements.lock.txt
+          .venv/bin/python -m pip check
+      - name: Backend tests and fresh-database migrations
+        run: .venv/bin/python -m pytest backend/tests -q
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --no-fund
+      - name: Frontend component tests
+        working-directory: frontend
+        run: npm test
+      - name: Production build
+        working-directory: frontend
+        run: npm run build
+      - name: TypeScript check
+        working-directory: frontend
+        run: npm run typecheck
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Start local services
+        run: |
+          mkdir -p tmp/ci
+          .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 > tmp/ci/backend.log 2>&1 &
+          (cd frontend && npm run start > ../tmp/ci/frontend.log 2>&1) &
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8000/api/health >/dev/null && curl --fail --silent http://127.0.0.1:3000 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat tmp/ci/backend.log tmp/ci/frontend.log
+          exit 1
+      - name: End-to-end workflows
+        working-directory: frontend
+        run: npm run test:e2e
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: synthetic-test-diagnostics
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+            tmp/ci/
+          retention-days: 7

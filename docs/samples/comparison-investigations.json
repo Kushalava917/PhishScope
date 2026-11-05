@@ -1,0 +1,991 @@
+[
+  {
+    "id": "e9610c39-c254-4000-8964-7a4626f0e21f",
+    "name": "Account security phishing",
+    "simulation": true,
+    "revision": "996618c0-f8bd-4f29-a79d-49559a388673",
+    "analysis": {
+      "engine_version": "1.0.0",
+      "analyzed_at": "2026-11-05T09:44:53.364387+00:00",
+      "parsed": {
+        "sender": "Microsoft Security <security@verify-account.example>",
+        "recipient": "Analyst <analyst@company.example>",
+        "reply_to": "help@support-desk.example",
+        "subject": "Urgent: verify your account or face suspension",
+        "date": "Thu, 05 Nov 2026 09:00:00 +0000",
+        "message_id": "<account@simulation.example>",
+        "received": [
+          "from mail.simulation.example ([192.0.2.25]) by gateway.company.example; Thu, 05 Nov 2026 09:00:00 +0000"
+        ],
+        "headers": [
+          {
+            "name": "From",
+            "value": "Microsoft Security <security@verify-account.example>"
+          },
+          {
+            "name": "To",
+            "value": "Analyst <analyst@company.example>"
+          },
+          {
+            "name": "Subject",
+            "value": "Urgent: verify your account or face suspension"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 05 Nov 2026 09:00:00 +0000"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<account@simulation.example>"
+          },
+          {
+            "name": "Received",
+            "value": "from mail.simulation.example ([192.0.2.25]) by gateway.company.example; Thu, 05 Nov 2026 09:00:00 +0000"
+          },
+          {
+            "name": "Authentication-Results",
+            "value": "gateway.company.example; spf=fail; dkim=fail; dmarc=fail"
+          },
+          {
+            "name": "X-PhishScope-Simulation",
+            "value": "true"
+          },
+          {
+            "name": "Reply-To",
+            "value": "help@support-desk.example"
+          },
+          {
+            "name": "MIME-Version",
+            "value": "1.0"
+          },
+          {
+            "name": "Content-Type",
+            "value": "multipart/alternative; boundary=\"===============9149741622102373688==\""
+          }
+        ],
+        "authentication": {
+          "spf": {
+            "result": "fail",
+            "evidence": [
+              "gateway.company.example; spf=fail; dkim=fail; dmarc=fail"
+            ],
+            "trust": "Reported by supplied headers; header provenance is not independently verified."
+          },
+          "dkim": {
+            "result": "fail",
+            "evidence": [
+              "gateway.company.example; spf=fail; dkim=fail; dmarc=fail"
+            ],
+            "trust": "Reported by supplied headers; header provenance is not independently verified."
+          },
+          "dmarc": {
+            "result": "fail",
+            "evidence": [
+              "gateway.company.example; spf=fail; dkim=fail; dmarc=fail"
+            ],
+            "trust": "Reported by supplied headers; header provenance is not independently verified."
+          }
+        },
+        "plain_text": "SIMULATION ONLY. Verify your password immediately at https://verify-account.example/login\n",
+        "html_body": "<p>SIMULATION ONLY. Urgent: verify your account password to prevent suspension.</p><a href=\"https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example\">https://microsoft.example/security</a><span style=\"display:none\"><a href=\"https://hidden.example/track\">hidden link</a></span>\n",
+        "html_text": "SIMULATION ONLY. Urgent: verify your account password to prevent suspension.\nhttps://microsoft.example/security\nhidden link",
+        "attachments": [],
+        "mime": [
+          {
+            "index": 0,
+            "type": "multipart/alternative",
+            "disposition": null,
+            "filename": null
+          },
+          {
+            "index": 1,
+            "type": "text/plain",
+            "disposition": null,
+            "filename": null
+          },
+          {
+            "index": 2,
+            "type": "text/html",
+            "disposition": null,
+            "filename": null
+          }
+        ]
+      },
+      "findings": [
+        {
+          "id": "F001",
+          "code": "reply_mismatch",
+          "title": "Reply-To domain differs from sender",
+          "points": 15,
+          "evidence": "From: Microsoft Security <security@verify-account.example>; Reply-To: help@support-desk.example",
+          "reason": "Replies would be delivered to a different registrable domain; legitimate workflows can also do this.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F002",
+          "code": "brand_impersonation",
+          "title": "Brand impersonation indicator",
+          "points": 15,
+          "evidence": "Microsoft Security <security@verify-account.example>",
+          "reason": "Display name claims a recognized brand while the sender uses another domain. Delegated senders remain possible.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F003",
+          "code": "auth_spf",
+          "title": "SPF reported fail",
+          "points": 8,
+          "evidence": "gateway.company.example; spf=fail; dkim=fail; dmarc=fail",
+          "reason": "The supplied Authentication-Results header explicitly reports this result; it may be forged.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F004",
+          "code": "auth_dkim",
+          "title": "DKIM reported fail",
+          "points": 8,
+          "evidence": "gateway.company.example; spf=fail; dkim=fail; dmarc=fail",
+          "reason": "The supplied Authentication-Results header explicitly reports this result; it may be forged.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F005",
+          "code": "auth_dmarc",
+          "title": "DMARC reported fail",
+          "points": 12,
+          "evidence": "gateway.company.example; spf=fail; dkim=fail; dmarc=fail",
+          "reason": "The supplied Authentication-Results header explicitly reports this result; it may be forged.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F006",
+          "code": "urgency",
+          "title": "Pressure and urgency language",
+          "points": 10,
+          "evidence": "Urgent, immediately",
+          "reason": "Time pressure can encourage a recipient to bypass verification.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F007",
+          "code": "credential_lure",
+          "title": "Potential credential request",
+          "points": 12,
+          "evidence": "SIMULATION ONLY. Verify your password immediately at https://verify-account.example/login\n\nSIMULATION ONLY. Urgent: verify your account password to prevent suspension. https://microsoft.example/security hidden link",
+          "reason": "Message requests account or credential interaction; credential theft is a hypothesis, not a confirmed outcome.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F008",
+          "code": "link_mismatch",
+          "title": "Link text disguises destination",
+          "points": 15,
+          "evidence": "Displayed: https://microsoft.example/security; actual: https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example",
+          "reason": "Visible link text and destination hostnames differ.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F009",
+          "code": "hidden_link",
+          "title": "Hidden HTML link",
+          "points": 8,
+          "evidence": "https://hidden.example/track",
+          "reason": "The link or an ancestor has a hiding style or hidden attribute.",
+          "confidence": "medium",
+          "state": "observed"
+        },
+        {
+          "id": "F010",
+          "code": "redirect_metadata",
+          "title": "External redirect target in URL",
+          "points": 8,
+          "evidence": "https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example -> https://landing.example",
+          "reason": "A URL-valued redirect parameter is present; actual server behavior is unverified.",
+          "confidence": "medium",
+          "state": "observed"
+        }
+      ],
+      "iocs": [
+        {
+          "id": "dc7a7584f72748e3",
+          "value": "https://hidden.example/track",
+          "type": "url",
+          "source": "HTML href",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "HTML href",
+              "excerpt": "https://hidden.example/track"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "ac03ea5a867be26f",
+          "value": "hidden.example",
+          "type": "domain",
+          "source": "HTML href",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "HTML href",
+              "excerpt": "hidden.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "dcdc0fa43ceb396b",
+          "value": "https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example",
+          "type": "url",
+          "source": "HTML href",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "HTML href",
+              "excerpt": "https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "eaf2a7d23fe704be",
+          "value": "verify-account.example",
+          "type": "domain",
+          "source": "HTML href",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "HTML href",
+              "excerpt": "verify-account.example"
+            },
+            {
+              "source": "Email text",
+              "excerpt": "verify-account.example"
+            },
+            {
+              "source": "Email address",
+              "excerpt": "verify-account.example"
+            },
+            {
+              "source": "Body text",
+              "excerpt": "verify-account.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "dbdd79b38439cc33",
+          "value": "https://landing.example",
+          "type": "url",
+          "source": "Redirect query metadata",
+          "reason": "Embedded redirect target; not fetched or confirmed",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Redirect query metadata",
+              "excerpt": "https://landing.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "a4334da58dcf1d4c",
+          "value": "landing.example",
+          "type": "domain",
+          "source": "Redirect query metadata",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Redirect query metadata",
+              "excerpt": "landing.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "4078a9559575dca8",
+          "value": "https://verify-account.example/login",
+          "type": "url",
+          "source": "Email text",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Email text",
+              "excerpt": "https://verify-account.example/login"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "118a3ab955edbf01",
+          "value": "security@verify-account.example",
+          "type": "email",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "security@verify-account.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "426d9561f9e661a2",
+          "value": "analyst@company.example",
+          "type": "email",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "analyst@company.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "2ca6e3bdc81c1b31",
+          "value": "company.example",
+          "type": "domain",
+          "source": "Email address",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Email address",
+              "excerpt": "company.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "91e231e2f58be33b",
+          "value": "account@simulation.example",
+          "type": "email",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "account@simulation.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "09242913ca778b20",
+          "value": "simulation.example",
+          "type": "domain",
+          "source": "Email address",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Email address",
+              "excerpt": "simulation.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "f455207db2be6f73",
+          "value": "help@support-desk.example",
+          "type": "email",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "help@support-desk.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "18289988a69d9ec4",
+          "value": "support-desk.example",
+          "type": "domain",
+          "source": "Email address",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Email address",
+              "excerpt": "support-desk.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "2de3530c5dc9bae1",
+          "value": "192.0.2.25",
+          "type": "ipv4",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "192.0.2.25"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "c282f1a5c6301004",
+          "value": "microsoft.example",
+          "type": "domain",
+          "source": "Body text",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:44:53.364387+00:00",
+          "evidence": [
+            {
+              "source": "Body text",
+              "excerpt": "microsoft.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        }
+      ],
+      "mappings": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "tactic": "Initial Access",
+          "description": "Social engineering delivered electronically to obtain access.",
+          "url": "https://attack.mitre.org/techniques/T1566/",
+          "state": "suspected",
+          "confidence": "medium",
+          "evidence": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F005",
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010"
+          ],
+          "justification": "Multiple local indicators are consistent with a phishing attempt; attribution and intent remain unverified."
+        },
+        {
+          "id": "T1566.002",
+          "name": "Spearphishing Link",
+          "tactic": "Initial Access",
+          "description": "A message uses a link to lure a recipient into an adversary-controlled workflow.",
+          "url": "https://attack.mitre.org/techniques/T1566/002/",
+          "state": "suspected",
+          "confidence": "medium",
+          "evidence": [
+            "https://verify-account.example/login",
+            "https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example",
+            "https://hidden.example/track"
+          ],
+          "justification": "Links occur in a message with corroborating suspicious findings."
+        }
+      ],
+      "risk": {
+        "score": 100,
+        "severity": "critical",
+        "factors": [
+          {
+            "id": "F001",
+            "code": "reply_mismatch",
+            "title": "Reply-To domain differs from sender",
+            "points": 15,
+            "evidence": "From: Microsoft Security <security@verify-account.example>; Reply-To: help@support-desk.example",
+            "reason": "Replies would be delivered to a different registrable domain; legitimate workflows can also do this.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F002",
+            "code": "brand_impersonation",
+            "title": "Brand impersonation indicator",
+            "points": 15,
+            "evidence": "Microsoft Security <security@verify-account.example>",
+            "reason": "Display name claims a recognized brand while the sender uses another domain. Delegated senders remain possible.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F003",
+            "code": "auth_spf",
+            "title": "SPF reported fail",
+            "points": 8,
+            "evidence": "gateway.company.example; spf=fail; dkim=fail; dmarc=fail",
+            "reason": "The supplied Authentication-Results header explicitly reports this result; it may be forged.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F004",
+            "code": "auth_dkim",
+            "title": "DKIM reported fail",
+            "points": 8,
+            "evidence": "gateway.company.example; spf=fail; dkim=fail; dmarc=fail",
+            "reason": "The supplied Authentication-Results header explicitly reports this result; it may be forged.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F005",
+            "code": "auth_dmarc",
+            "title": "DMARC reported fail",
+            "points": 12,
+            "evidence": "gateway.company.example; spf=fail; dkim=fail; dmarc=fail",
+            "reason": "The supplied Authentication-Results header explicitly reports this result; it may be forged.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F006",
+            "code": "urgency",
+            "title": "Pressure and urgency language",
+            "points": 10,
+            "evidence": "Urgent, immediately",
+            "reason": "Time pressure can encourage a recipient to bypass verification.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F007",
+            "code": "credential_lure",
+            "title": "Potential credential request",
+            "points": 12,
+            "evidence": "SIMULATION ONLY. Verify your password immediately at https://verify-account.example/login\n\nSIMULATION ONLY. Urgent: verify your account password to prevent suspension. https://microsoft.example/security hidden link",
+            "reason": "Message requests account or credential interaction; credential theft is a hypothesis, not a confirmed outcome.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F008",
+            "code": "link_mismatch",
+            "title": "Link text disguises destination",
+            "points": 15,
+            "evidence": "Displayed: https://microsoft.example/security; actual: https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example",
+            "reason": "Visible link text and destination hostnames differ.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F009",
+            "code": "hidden_link",
+            "title": "Hidden HTML link",
+            "points": 8,
+            "evidence": "https://hidden.example/track",
+            "reason": "The link or an ancestor has a hiding style or hidden attribute.",
+            "confidence": "medium",
+            "state": "observed"
+          },
+          {
+            "id": "F010",
+            "code": "redirect_metadata",
+            "title": "External redirect target in URL",
+            "points": 8,
+            "evidence": "https://verify-account.example/login?redirect=https%3A%2F%2Flanding.example -> https://landing.example",
+            "reason": "A URL-valued redirect parameter is present; actual server behavior is unverified.",
+            "confidence": "medium",
+            "state": "observed"
+          }
+        ],
+        "confidence": "medium",
+        "reasoning": "Sum of unique local risk factors, capped at 100. Thresholds are application-defined: 0–24 low, 25–49 medium, 50–74 high, 75–100 critical.",
+        "compromise": "No evidence of successful compromise",
+        "limitations": [
+          "Local heuristic assessment — not externally verified.",
+          "Authentication-Results headers can be forged; their receiving gateway provenance is unverified.",
+          "No URLs were fetched, redirects followed, DNS lookups performed, or attachments executed.",
+          "No click, execution, credential exposure or successful compromise is established.",
+          "Sender/domain reputation is unknown until an explicit external lookup; lack of detections does not establish safety."
+        ]
+      },
+      "recommendations": [
+        {
+          "phase": "Preparation",
+          "action": "Review email authentication enforcement and awareness training.",
+          "reason": "Observed anomalies provide concrete examples for control review.",
+          "evidence": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F005",
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010"
+          ]
+        },
+        {
+          "phase": "Containment",
+          "action": "Quarantine this message for review and identify other recipients before taking broader action.",
+          "reason": "Local findings warrant triage; unverified infrastructure should not be automatically blocked.",
+          "evidence": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F005",
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010"
+          ]
+        },
+        {
+          "phase": "Eradication",
+          "action": "After validation, remove matching confirmed malicious messages.",
+          "reason": "Preserve original evidence and confirm scope first.",
+          "evidence": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F005",
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010"
+          ]
+        },
+        {
+          "phase": "Recovery",
+          "action": "Ask whether the recipient interacted; reset credentials only if exposure is established.",
+          "reason": "The email alone contains no evidence of compromise.",
+          "evidence": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F005",
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010"
+          ]
+        },
+        {
+          "phase": "Lessons Learned",
+          "action": "Document verified patterns and review matching detection rules.",
+          "reason": "Use evidence-backed patterns while recording false-positive possibilities.",
+          "evidence": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F005",
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010"
+          ]
+        }
+      ],
+      "limitations": [
+        "Local heuristic assessment — not externally verified.",
+        "Authentication-Results headers can be forged; their receiving gateway provenance is unverified.",
+        "No URLs were fetched, redirects followed, DNS lookups performed, or attachments executed.",
+        "No click, execution, credential exposure or successful compromise is established.",
+        "Sender/domain reputation is unknown until an explicit external lookup; lack of detections does not establish safety."
+      ]
+    }
+  },
+  {
+    "id": "08e08a59-f0db-4c44-b354-a4ef885f6168",
+    "name": "Legitimate business email",
+    "simulation": true,
+    "revision": "0aabc9d5-d98d-4f63-b34c-f31dd5db41a4",
+    "analysis": {
+      "engine_version": "1.0.0",
+      "analyzed_at": "2026-11-05T09:48:17.069833+00:00",
+      "parsed": {
+        "sender": "Taylor Morgan <taylor@company.example>",
+        "recipient": "Analyst <analyst@company.example>",
+        "reply_to": "",
+        "subject": "Project planning meeting on Friday",
+        "date": "Thu, 05 Nov 2026 09:00:00 +0000",
+        "message_id": "<benign@simulation.example>",
+        "received": [
+          "from mail.simulation.example ([192.0.2.25]) by gateway.company.example; Thu, 05 Nov 2026 09:00:00 +0000"
+        ],
+        "headers": [
+          {
+            "name": "From",
+            "value": "Taylor Morgan <taylor@company.example>"
+          },
+          {
+            "name": "To",
+            "value": "Analyst <analyst@company.example>"
+          },
+          {
+            "name": "Subject",
+            "value": "Project planning meeting on Friday"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 05 Nov 2026 09:00:00 +0000"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<benign@simulation.example>"
+          },
+          {
+            "name": "Received",
+            "value": "from mail.simulation.example ([192.0.2.25]) by gateway.company.example; Thu, 05 Nov 2026 09:00:00 +0000"
+          },
+          {
+            "name": "Authentication-Results",
+            "value": "gateway.company.example; spf=pass; dkim=pass; dmarc=pass"
+          },
+          {
+            "name": "X-PhishScope-Simulation",
+            "value": "true"
+          },
+          {
+            "name": "Content-Type",
+            "value": "text/plain; charset=\"utf-8\""
+          },
+          {
+            "name": "Content-Transfer-Encoding",
+            "value": "quoted-printable"
+          },
+          {
+            "name": "MIME-Version",
+            "value": "1.0"
+          }
+        ],
+        "authentication": {
+          "spf": {
+            "result": "pass",
+            "evidence": [
+              "gateway.company.example; spf=pass; dkim=pass; dmarc=pass"
+            ],
+            "trust": "Reported by supplied headers; header provenance is not independently verified."
+          },
+          "dkim": {
+            "result": "pass",
+            "evidence": [
+              "gateway.company.example; spf=pass; dkim=pass; dmarc=pass"
+            ],
+            "trust": "Reported by supplied headers; header provenance is not independently verified."
+          },
+          "dmarc": {
+            "result": "pass",
+            "evidence": [
+              "gateway.company.example; spf=pass; dkim=pass; dmarc=pass"
+            ],
+            "trust": "Reported by supplied headers; header provenance is not independently verified."
+          }
+        },
+        "plain_text": "SIMULATION ONLY. Hi team, the project planning meeting is on Friday at 10:00. The agenda covers milestones and resourcing. Thanks, Taylor.\n",
+        "html_body": "",
+        "html_text": "",
+        "attachments": [],
+        "mime": [
+          {
+            "index": 0,
+            "type": "text/plain",
+            "disposition": null,
+            "filename": null
+          }
+        ]
+      },
+      "findings": [],
+      "iocs": [
+        {
+          "id": "77a7f3074e38c641",
+          "value": "taylor@company.example",
+          "type": "email",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:48:17.069833+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "taylor@company.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "2ca6e3bdc81c1b31",
+          "value": "company.example",
+          "type": "domain",
+          "source": "Email address",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:48:17.069833+00:00",
+          "evidence": [
+            {
+              "source": "Email address",
+              "excerpt": "company.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "426d9561f9e661a2",
+          "value": "analyst@company.example",
+          "type": "email",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:48:17.069833+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "analyst@company.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "15716b44c8d4e1c3",
+          "value": "benign@simulation.example",
+          "type": "email",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:48:17.069833+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "benign@simulation.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "09242913ca778b20",
+          "value": "simulation.example",
+          "type": "domain",
+          "source": "Email address",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "medium",
+          "first_observed": "2026-11-05T09:48:17.069833+00:00",
+          "evidence": [
+            {
+              "source": "Email address",
+              "excerpt": "simulation.example"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        },
+        {
+          "id": "2de3530c5dc9bae1",
+          "value": "192.0.2.25",
+          "type": "ipv4",
+          "source": "Headers/body",
+          "reason": "Extracted from original evidence",
+          "reputation": "unverified",
+          "confidence": "high",
+          "first_observed": "2026-11-05T09:48:17.069833+00:00",
+          "evidence": [
+            {
+              "source": "Headers/body",
+              "excerpt": "192.0.2.25"
+            }
+          ],
+          "assessment": "Local heuristic assessment — not externally verified."
+        }
+      ],
+      "mappings": [],
+      "risk": {
+        "score": 0,
+        "severity": "low",
+        "factors": [],
+        "confidence": "low",
+        "reasoning": "Sum of unique local risk factors, capped at 100. Thresholds are application-defined: 0–24 low, 25–49 medium, 50–74 high, 75–100 critical.",
+        "compromise": "No evidence of successful compromise",
+        "limitations": [
+          "Local heuristic assessment — not externally verified.",
+          "Authentication-Results headers can be forged; their receiving gateway provenance is unverified.",
+          "No URLs were fetched, redirects followed, DNS lookups performed, or attachments executed.",
+          "No click, execution, credential exposure or successful compromise is established.",
+          "Sender/domain reputation is unknown until an explicit external lookup; lack of detections does not establish safety."
+        ]
+      },
+      "recommendations": [
+        {
+          "phase": "Lessons Learned",
+          "action": "Record the assessment and close after analyst review.",
+          "reason": "No configured local risk factors were detected; this does not guarantee safety.",
+          "evidence": []
+        }
+      ],
+      "limitations": [
+        "Local heuristic assessment — not externally verified.",
+        "Authentication-Results headers can be forged; their receiving gateway provenance is unverified.",
+        "No URLs were fetched, redirects followed, DNS lookups performed, or attachments executed.",
+        "No click, execution, credential exposure or successful compromise is established.",
+        "Sender/domain reputation is unknown until an explicit external lookup; lack of detections does not establish safety."
+      ]
+    }
+  }
+]

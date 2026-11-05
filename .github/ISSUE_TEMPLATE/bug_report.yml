@@ -1,0 +1,24 @@
+name: Bug report
+description: Report a reproducible problem using synthetic evidence only.
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach real emails, credentials, private indicators, or sensitive screenshots. Report security concerns privately to the owner.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal synthetic fixture if necessary.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: OS, Python, Node.js, browser, and commit
